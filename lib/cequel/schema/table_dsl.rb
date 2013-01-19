@@ -21,8 +21,8 @@ module Cequel
         @table.add_key(name, type, clustering_order)
       end
 
-      def column(name, type)
-        @table.add_column(name, type)
+      def column(name, type, options = {})
+        column = @table.add_column(name, type, options[:index])
       end
 
       def list(name, type)

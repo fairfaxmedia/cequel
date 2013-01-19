@@ -4,10 +4,14 @@ module Cequel
 
     class Column
 
-      attr_reader :name, :type
+      attr_reader :name, :type, :index_name
 
-      def initialize(name, type)
-        @name, @type = name, type
+      def initialize(name, type, index_name = nil)
+        @name, @type, @index_name = name, type, index_name
+      end
+
+      def indexed?
+        !!@index_name
       end
 
       def to_cql

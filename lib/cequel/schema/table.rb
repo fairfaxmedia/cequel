@@ -36,8 +36,9 @@ module Cequel
         end
       end
 
-      def add_column(name, type)
-        @columns << Column.new(name, type)
+      def add_column(name, type, index_name)
+        index_name = :"#{@name}_#{name}_idx" if index_name == true
+        Column.new(name, type, index_name).tap { |column| @columns << column }
       end
 
       def add_list(name, type)
@@ -57,13 +58,24 @@ module Cequel
       end
 
       def create_cql
-        "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})".tap do |cql|
-          properties = properties_cql
-          cql << " WITH #{properties}" if properties
-        end
+        create_statement = "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})"
+        properties = properties_cql
+        create_statement << " WITH #{properties}" if properties
+        [create_statement, *index_statements]
       end
 
       private
+
+      def index_statements
+        [].tap do |statements|
+          @columns.each do |column|
+            if column.indexed?
+              statements <<
+                "CREATE INDEX #{column.index_name} ON #{@name} (#{column.name})"
+            end
+          end
+        end
+      end
 
       def columns_cql
         @columns.map(&:to_cql).join(', ')

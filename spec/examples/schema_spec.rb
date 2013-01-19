@@ -208,6 +208,26 @@ describe Cequel::Schema do
       end
     end
 
+    describe 'indices' do
+      it 'should create indices' do
+        cequel.schema.create_table(:posts) do
+          key :blog_permalink, :ascii
+          key :id, :uuid, :desc
+          column :title, :text, :index => true
+        end
+        column(:posts, :title)['index_name'].should == 'posts_title_idx'
+      end
+
+      it 'should create indices with specified name' do
+        cequel.schema.create_table(:posts) do
+          key :blog_permalink, :ascii
+          key :id, :uuid, :desc
+          column :title, :text, :index => :silly_idx
+        end
+        column(:posts, :title)['index_name'].should == 'silly_idx'
+      end
+    end
+
   end
 
   def column_family(name)
