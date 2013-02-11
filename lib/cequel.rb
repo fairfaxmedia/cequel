@@ -10,6 +10,7 @@ require 'cequel/keyspace'
 require 'cequel/row_specification'
 require 'cequel/schema'
 require 'cequel/statement'
+require 'cequel/type'
 
 module Cequel
   def self.connect(configuration = nil)
