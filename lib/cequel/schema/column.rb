@@ -4,14 +4,10 @@ module Cequel
 
     class Column
 
-      attr_reader :name, :type, :index_name
+      attr_reader :name, :type
 
       def initialize(name, type, index_name = nil)
-        @name, @type, @index_name = name, type, index_name
-      end
-
-      def indexed?
-        !!@index_name
+        @name, @type = name, type
       end
 
       def to_cql
@@ -20,7 +16,47 @@ module Cequel
 
     end
 
-    class List < Column
+    class PartitionKey < Column; end
+
+    class NonpartitionKey < Column
+
+      attr_reader :clustering_order
+
+      def initialize(name, type, clustering_order = nil)
+        super(name, type)
+        @clustering_order = (clustering_order || :asc).to_sym
+      end
+
+      def clustering_order_cql
+        "#{@name} #{@clustering_order}"
+      end
+
+    end
+
+    class DataColumn < Column
+
+      attr_reader :index_name
+
+      def initialize(name, type, index_name = nil)
+        super(name, type)
+        @index_name = index_name
+      end
+
+      def indexed?
+        !!@index_name
+      end
+
+    end
+
+    class CollectionColumn < Column
+
+      def indexed?
+        false
+      end
+
+    end
+
+    class List < CollectionColumn
 
       def to_cql
         "#{@name} LIST <#{@type}>"
@@ -28,7 +64,7 @@ module Cequel
 
     end
 
-    class Set < Column
+    class Set < CollectionColumn
 
       def to_cql
         "#{@name} SET <#{@type}>"
@@ -36,7 +72,7 @@ module Cequel
 
     end
 
-    class Map < Column
+    class Map < CollectionColumn
 
       attr_reader :key_type
       alias_method :value_type, :type

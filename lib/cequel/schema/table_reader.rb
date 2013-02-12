@@ -9,12 +9,12 @@ module Cequel
       REVERSED_TYPE_PATTERN =
         /^org\.apache\.cassandra\.db\.marshal\.ReversedType\((.+)\)$/
 
-      def self.read(table_data)
-        new(table_data).read
+      def self.read(table_data, column_data)
+        new(table_data, column_data).read
       end
 
-      def initialize(table_data)
-        @table_data = table_data
+      def initialize(table_data, column_data)
+        @table_data, @column_data = table_data, column_data
         @table = Table.new(table_data['columnfamily_name'].to_sym)
       end
       private_class_method(:new)
@@ -22,6 +22,7 @@ module Cequel
       def read
         read_partition_keys
         read_nonpartition_keys
+        read_data_columns
         @table
       end
 
@@ -47,6 +48,16 @@ module Cequel
             column_alias.to_sym,
             Type.lookup_internal(type),
             clustering_order
+          )
+        end
+      end
+
+      def read_data_columns
+        @column_data.each do |result|
+          @table.add_column(
+            result['column_name'].to_sym,
+            Type.lookup_internal(result['validator']),
+            nil
           )
         end
       end

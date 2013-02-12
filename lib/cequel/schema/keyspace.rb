@@ -14,7 +14,12 @@ module Cequel
           WHERE keyspace_name = ? AND columnfamily_name = ?
         CQL
         table_data = table_query.first.to_hash
-        Table.read(table_data)
+        column_query = @keyspace.execute(<<-CQL, @keyspace.name, name)
+          SELECT * FROM system.schema_columns
+          WHERE keyspace_name = ? AND columnfamily_name = ?
+        CQL
+        column_data = column_query.map(&:to_hash)
+        TableReader.read(table_data, column_data)
       end
 
       def create_table(name, &block)
