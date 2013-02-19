@@ -306,4 +306,23 @@ describe Cequel::Schema::TableReader do
 
   end # describe 'reading storage properties'
 
+  describe 'compact storage' do
+
+    it 'should read non-compact storage status' do
+      cequel.execute <<-CQL
+        CREATE TABLE posts (permalink text PRIMARY KEY, body text)
+      CQL
+      table.should_not be_compact_storage
+    end
+
+    it 'should read compact storage status' do
+      cequel.execute <<-CQL
+        CREATE TABLE posts (permalink text PRIMARY KEY, body text)
+        WITH COMPACT STORAGE
+      CQL
+      table.should be_compact_storage
+    end
+
+  end
+
 end

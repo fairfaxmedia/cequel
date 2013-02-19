@@ -36,7 +36,8 @@ module Cequel
       private
 
       def read_partition_keys
-        types = parse_composite_types(@table_data['key_validator'])
+        validator = @table_data['key_validator']
+        types = parse_composite_types(validator) || [validator]
         JSON.parse(@table_data['key_aliases']).zip(types) do |key_alias, type|
           name = key_alias.to_sym
           @table.add_partition_key(key_alias.to_sym, Type.lookup_internal(type))
@@ -46,6 +47,10 @@ module Cequel
       def read_nonpartition_keys
         column_aliases = JSON.parse(@table_data['column_aliases'])
         comparators = parse_composite_types(@table_data['comparator'])
+        unless comparators
+          @table.compact_storage = true
+          comparators = [@table_data['comparator']]
+        end
         column_aliases.zip(comparators) do |column_alias, type|
           if REVERSED_TYPE_PATTERN =~ type
             type = $1
@@ -97,8 +102,6 @@ module Cequel
       def parse_composite_types(type_string)
         if COMPOSITE_TYPE_PATTERN =~ type_string
           $1.split(',')
-        else
-          [type_string]
         end
       end
 

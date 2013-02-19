@@ -70,6 +70,10 @@ module Cequel
         @properties[name].try(:value)
       end
 
+      def compact_storage?
+        !!@compact_storage
+      end
+
       def create_cql
         create_statement = "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})"
         properties = properties_cql
