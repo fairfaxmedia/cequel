@@ -6,7 +6,7 @@ module Cequel
 
       attr_reader :name, :type
 
-      def initialize(name, type, index_name = nil)
+      def initialize(name, type)
         @name, @type = name, type
       end
 

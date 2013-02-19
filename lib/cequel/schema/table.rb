@@ -14,8 +14,8 @@ module Cequel
 
       def initialize(name)
         @name = name
-        @partition_keys, @nonpartition_keys, @data_columns, @properties =
-          [], [], [], []
+        @partition_keys, @nonpartition_keys, @data_columns = [], [], []
+        @properties = ActiveSupport::HashWithIndifferentAccess.new
       end
 
       def add_key(name, type, clustering_order = nil)
@@ -59,11 +59,15 @@ module Cequel
       end
 
       def add_property(name, value)
-        @properties << TableProperty.new(name, value)
+        @properties[name] = TableProperty.new(name, value)
       end
 
       def columns
         @partition_keys + @nonpartition_keys + @data_columns
+      end
+
+      def property(name)
+        @properties[name].try(:value)
       end
 
       def create_cql
@@ -106,7 +110,7 @@ module Cequel
       end
 
       def properties_cql
-        properties_fragments = @properties.map { |property| property.to_cql }
+        properties_fragments = @properties.map { |_, property| property.to_cql }
         properties_fragments << 'COMPACT STORAGE' if @compact_storage
         if @nonpartition_keys.any?
           clustering_fragment =
