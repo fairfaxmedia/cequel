@@ -2,6 +2,8 @@ require File.expand_path('../spec_helper', __FILE__)
 
 describe Cequel::Schema do
 
+  let(:table) { cequel.schema.read_table(:posts) }
+
   describe '#create_table' do
 
     after do
@@ -17,17 +19,16 @@ describe Cequel::Schema do
       end
 
       it 'should create key alias' do
-        column_family('posts')['key_aliases'].should == %w(permalink).to_json
+        table.partition_keys.map(&:name).should == [:permalink]
       end
 
       it 'should set key validator' do
-        column_family('posts')['key_validator'].
-          should == 'org.apache.cassandra.db.marshal.AsciiType'
+        table.partition_keys.map(&:type).should == [Cequel::Type[:ascii]]
       end
 
       it 'should set non-key columns' do
-        column('posts', 'title')['validator'].should ==
-          'org.apache.cassandra.db.marshal.UTF8Type'
+        table.columns.find { |column| column.name == :title }.type.
+          should == Cequel::Type[:text]
       end
     end
 
