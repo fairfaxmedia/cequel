@@ -101,12 +101,8 @@ module Cequel
     def execute(statement, *bind_vars)
       log('CQL', statement, *bind_vars) do
         with_connection do |conn|
-           unless bind_vars.empty?
-             prepared_statement = conn.prepare(statement)
-             prepared_statement.execute(*bind_vars)
-          else
-            conn.execute(statement)
-          end
+          prepared_statement = conn.prepare(statement)
+          prepared_statement.execute(*bind_vars)
         end
       end
     end
@@ -151,6 +147,7 @@ module Cequel
     private
 
     def build_connection
+      # FIXME: hosts are an array of HOST:PORT pairs
       client = Cql::Client.new({host: "127.0.0.1"})
       client.start!
       client.use(@keyspace) if @keyspace

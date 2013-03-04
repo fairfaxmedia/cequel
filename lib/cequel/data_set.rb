@@ -210,7 +210,7 @@ module Cequel
     def each
       if block_given?
         begin
-          @keyspace.execute(*cql).fetch do |row|
+          @keyspace.execute(*cql).each do |row|
             yield row.to_hash.with_indifferent_access
           end
         rescue EmptySubquery
