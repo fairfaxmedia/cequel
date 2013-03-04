@@ -21,7 +21,6 @@ DESC
   s.add_runtime_dependency 'activesupport', '~> 3.1'
   s.add_runtime_dependency 'activemodel', '~> 3.1'
   s.add_runtime_dependency 'simple_uuid', '0.3.0'
-#  s.add_runtime_dependency 'cassandra-cql', '~> 1.0'
   s.add_runtime_dependency 'cql-rb', '~> 1.0.pre'
   s.add_runtime_dependency 'connection_pool', '~> 0.9.2'
   s.add_runtime_dependency 'i18n'
@@ -30,5 +29,5 @@ DESC
   s.add_development_dependency 'geminabox'
   s.add_development_dependency 'rocco'
   s.add_development_dependency 'redcarpet', '< 2.0' # for rocco compatibility
-  s.requirements << 'Cassandra 1.0+'
+  s.requirements << 'Cassandra 1.2+'
 end
