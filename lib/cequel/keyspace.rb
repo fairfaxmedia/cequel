@@ -101,7 +101,12 @@ module Cequel
     def execute(statement, *bind_vars)
       log('CQL', statement, *bind_vars) do
         with_connection do |conn|
-          conn.execute(statement, *bind_vars)
+           unless bind_vars.empty?
+             prepared_statement = conn.prepare(statement)
+             prepared_statement.execute(*bind_vars)
+          else
+            conn.execute(statement)
+          end
         end
       end
     end
@@ -146,12 +151,10 @@ module Cequel
     private
 
     def build_connection
-      options = @keyspace ? {:keyspace => @keyspace } : {}
-      CassandraCQL::Database.new(
-        @hosts,
-        options,
-        @thrift_options
-      )
+      client = Cql::Client.new({host: "127.0.0.1"})
+      client.start!
+      client.use(@keyspace) if @keyspace
+      client
     end
 
     def get_batch
@@ -170,12 +173,15 @@ module Cequel
       return yield unless logger || slowlog
       response = nil
       time = Benchmark.ms { response = yield }
+      
       generate_message = proc do
         sprintf(
           '%s (%dms) %s', label, time.to_i,
-          CassandraCQL::Statement.sanitize(statement, bind_vars)
+          statement
+          # CassandraCQL::Statement.sanitize(statement, bind_vars)
         )
       end
+
       logger.debug(&generate_message) if self.logger
       threshold = self.slowlog_threshold || 2000
       if slowlog && time >= threshold

@@ -170,7 +170,7 @@ class Post
   private
 
   def generate_key
-    CassandraCQL::UUID.new
+    SimpleUUID::UUID.new
   end
 
 end

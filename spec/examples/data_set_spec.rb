@@ -384,7 +384,7 @@ describe Cequel::DataSet do
   describe '#count' do
     it 'should run a count query and return count' do
       connection.stub(:execute).with("SELECT COUNT(*) FROM posts").
-        and_return result_stub('count' => 4)
+        and_return count_result_stub(4)
 
       cequel[:posts].count.should == 4
     end
@@ -399,7 +399,7 @@ describe Cequel::DataSet do
 
     it 'should use limit if specified' do
       connection.stub(:execute).with("SELECT COUNT(*) FROM posts LIMIT 100000").
-        and_return result_stub('count' => 4)
+        and_return count_result_stub(4)
 
       cequel[:posts].limit(100_000).count.should == 4
     end

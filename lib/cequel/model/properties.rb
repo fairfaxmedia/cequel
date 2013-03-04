@@ -108,11 +108,11 @@ module Cequel
       def inspect
         "#<#{self.class.name}".tap do |inspected|
           attributes.each_pair do |column, value|
-            inspected_value =
-              case value
-              when CassandraCQL::UUID then value.to_guid
-              else value.inspect
-              end
+            inspected_value = value
+              # case value
+              # when CassandraCQL::UUID then value.to_guid
+              # else value.inspect
+              # end
             inspected << " #{column}:#{inspected_value}"
           end
         end

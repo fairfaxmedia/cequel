@@ -3,8 +3,8 @@ require File.expand_path('../spec_helper', __FILE__)
 describe Cequel::Model::Counter do
   let(:counter) { CommentCounts[1] }
   let(:dictionary) { counter }
-  let(:uuid1) { CassandraCQL::UUID.new }
-  let(:uuid2) { CassandraCQL::UUID.new }
+  let(:uuid1) { SimpleUUID::UUID.new }
+  let(:uuid2) { SimpleUUID::UUID.new }
 
   it_behaves_like 'readable dictionary'
 

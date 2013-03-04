@@ -87,8 +87,7 @@ describe Cequel::Model::Scope do
 
   describe '#count' do
     it 'should count records' do
-      connection.stub(:execute).with("SELECT COUNT(*) FROM posts").
-        and_return result_stub('count' => 5)
+      connection.stub(:execute).and_return count_result_stub(5)
 
       Post.count.should == 5
     end
@@ -96,7 +95,7 @@ describe Cequel::Model::Scope do
     it 'should count records in scope' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 5)
+        and_return count_result_stub(5)
 
       Post.where(:blog_id => 1).count.should == 5
     end
@@ -109,10 +108,10 @@ describe Cequel::Model::Scope do
     it 'should perform multiple COUNT queries if non-key column selected for multiple values' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 3)
+        and_return count_result_stub(3)
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 2).
-        and_return result_stub('count' => 2)
+        and_return count_result_stub(2)
 
       Post.where(:blog_id => [1, 2]).count.should == 5
     end
@@ -124,7 +123,7 @@ describe Cequel::Model::Scope do
     it 'should apply index preference when specified' do
       connection.should_receive(:execute).
         with("SELECT COUNT(*) FROM assets WHERE ? = ? AND ? = ?", :checksum, 'abcdef', :class_name, 'Photo').
-        and_return result_stub('count' => 0)
+        and_return count_result_stub(0)
       Photo.where(:checksum => 'abcdef').count
     end
   end
@@ -167,7 +166,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return true if COUNT > 0' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 5)
+        and_return count_result_stub(5)
 
       Post.where(:blog_id => 1).any?.should be_true
     end
@@ -175,7 +174,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return false if COUNT == 0' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 0)
+        and_return count_result_stub(0)
 
       Post.where(:blog_id => 1).any?.should be_false
     end
@@ -197,7 +196,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return false if COUNT > 0' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 5)
+        and_return count_result_stub(5)
 
       Post.where(:blog_id => 1).none?.should be_false
     end
@@ -205,7 +204,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return true if COUNT == 0' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 0)
+        and_return count_result_stub(0)
 
       Post.where(:blog_id => 1).none?.should be_true
     end
@@ -227,7 +226,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return false if COUNT == 0' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 0)
+        and_return count_result_stub(0)
 
       Post.where(:blog_id => 1).one?.should be_false
     end
@@ -235,7 +234,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return true if COUNT == 1' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 1)
+        and_return count_result_stub(1)
 
       Post.where(:blog_id => 1).one?.should be_true
     end
@@ -243,7 +242,7 @@ describe Cequel::Model::Scope do
     it 'if called without block, should return false if COUNT > 1' do
       connection.stub(:execute).
         with("SELECT COUNT(*) FROM posts WHERE ? = ?", :blog_id, 1).
-        and_return result_stub('count' => 12)
+        and_return count_result_stub(12)
 
       Post.where(:blog_id => 1).one?.should be_false
     end

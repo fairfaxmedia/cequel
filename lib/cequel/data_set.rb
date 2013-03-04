@@ -225,7 +225,7 @@ module Cequel
     # @return [Hash] the first row in this data set
     #
     def first
-      row = @keyspace.execute(*limit(1).cql).fetch_row
+      row = @keyspace.execute(*limit(1).cql).first
       row.to_hash.with_indifferent_access if row
     rescue EmptySubquery
       nil
@@ -235,7 +235,8 @@ module Cequel
     # @return [Fixnum] the number of rows in this data set
     #
     def count
-      @keyspace.execute(*count_cql).fetch_row['count']
+      # @keyspace.execute(*count_cql).fetch_row['count']
+      @keyspace.execute(*count_cql).metadata['count']
     rescue EmptySubquery
       0
     end
@@ -266,7 +267,8 @@ module Cequel
     end
 
     def inspect
-      "#<#{self.class.name}: #{CassandraCQL::Statement.sanitize(cql.first, cql[1..-1])}>"
+      #{ }"#<#{self.class.name}: #{CassandraCQL::Statement.sanitize(cql.first, cql[1..-1])}>"
+
     end
 
     def ==(other)

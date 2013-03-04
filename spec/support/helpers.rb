@@ -10,6 +10,12 @@ module Cequel
         ResultStub.new(results)
       end
 
+      def count_result_stub(count)
+        result = ResultStub.new([])
+        result.metadata = {:count => count}.with_indifferent_access
+        result
+      end
+
       def connection
         Connection
       end
