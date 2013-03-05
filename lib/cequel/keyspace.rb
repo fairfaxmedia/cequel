@@ -19,11 +19,33 @@ module Cequel
 
     def configure(configuration = {})
       @configuration = configuration
-      @hosts = configuration[:host] || configuration[:hosts]
+      @hosts, @port = build_hosts(configuration[:host] || configuration[:hosts])
       @thrift_options = configuration[:thrift].try(:symbolize_keys) || {}
       @keyspace = configuration[:keyspace]
       # reset the connections
       clear_active_connections!
+    end
+
+    def build_hosts(hosts)
+      host = []
+      port = 9042
+
+      # remove port if in format HOST:PORT (URI.parse?)
+      # FIXME: cql-rb should support 
+      #        hosts with different ports
+      if hosts.kind_of?(Array)
+        hosts.each do |host|
+          parsed = host.split(':')
+          host << parsed[0]
+          port = parsed[1] if parsed[1]
+        end
+      else
+        parsed = hosts.split(':')
+        host << parsed[0]
+        port = parsed[1] if parsed[1]
+      end
+
+      [host.join(','), port]
     end
 
     def logger=(logger)
@@ -147,8 +169,7 @@ module Cequel
     private
 
     def build_connection
-      # FIXME: hosts are an array of HOST:PORT pairs
-      client = Cql::Client.new({host: "127.0.0.1"})
+      client = Cql::Client.new({host: @hosts, port: @port})
       client.start!
       client.use(@keyspace) if @keyspace
       client
