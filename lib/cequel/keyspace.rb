@@ -27,7 +27,7 @@ module Cequel
     end
 
     def build_hosts(hosts)
-      host = []
+      built = []
       port = 9042
 
       # remove port if in format HOST:PORT (URI.parse?)
@@ -36,16 +36,16 @@ module Cequel
       if hosts.kind_of?(Array)
         hosts.each do |host|
           parsed = host.split(':')
-          host << parsed[0]
+          built << parsed[0]
           port = parsed[1] if parsed[1]
         end
       else
         parsed = hosts.split(':')
-        host << parsed[0]
+        built << parsed[0]
         port = parsed[1] if parsed[1]
       end
 
-      [host.join(','), port]
+      [built.join(','), port]
     end
 
     def logger=(logger)
