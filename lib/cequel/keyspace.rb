@@ -170,7 +170,6 @@ module Cequel
 
     def build_connection
       client = Cql::Client.connect({host: @hosts, port: @port})
-      client.start!
       client.use(@keyspace) if @keyspace
       client
     end
