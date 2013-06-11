@@ -169,7 +169,7 @@ module Cequel
     private
 
     def build_connection
-      client = Cql::Client.new({host: @hosts, port: @port})
+      client = Cql::Client.connect({host: @hosts, port: @port})
       client.start!
       client.use(@keyspace) if @keyspace
       client
